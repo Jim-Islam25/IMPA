@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IMPA — International Medical Physics Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0A0E13;
+    --panel:#111820;
+    --panel-2:#161F29;
+    --line:#232F3B;
+    --amber:#E8A33D;
+    --cyan:#5FCFC7;
+    --text:#E7ECEF;
+    --muted:#8B99A6;
+    --good:#5FCF8B;
+    --bad:#E8636B;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth; scroll-padding-top:76px; scroll-padding-top:calc(76px + env(safe-area-inset-top,0px));}
+  body{
+    background:var(--ink); color:var(--text);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Space Grotesk', sans-serif; letter-spacing:-0.01em;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  a{color:inherit;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 28px;}
+
+  /* NAV */
+  nav{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    top:env(safe-area-inset-top,0px);
+    background:rgba(10,14,19,0.86); backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .navrow{display:flex; align-items:center; justify-content:space-between; height:64px;}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.15rem;}
+  .brand-mark{width:30px; height:30px; border:1.5px solid var(--cyan); border-radius:6px; position:relative; flex:none;}
+  .brand-mark::before{content:""; position:absolute; inset:6px; border:1.5px solid var(--amber); border-radius:2px;}
+  .navlinks{display:flex; gap:22px; font-size:0.9rem; color:var(--muted);}
+  .navlinks a{text-decoration:none; transition:color .2s;}
+  .navlinks a:hover, .navlinks a:focus-visible{color:var(--cyan);}
+  .navlinks a:focus-visible{outline:2px solid var(--cyan); outline-offset:4px;}
+  .navtoggle{display:none;}
+
+  /* HERO */
+  header.hero{padding:150px 0 90px; position:relative;}
+  .hero-grid{display:grid; grid-template-columns:1.2fr 1fr; gap:48px; align-items:center;}
+  .eyebrow-line{display:flex; align-items:center; gap:10px; color:var(--muted); font-size:0.85rem; margin-bottom:18px;}
+  .eyebrow-line .dot{width:7px; height:7px; border-radius:50%; background:var(--good); box-shadow:0 0 0 3px rgba(95,207,139,0.18);}
+  h1.title{font-size:clamp(2.1rem, 4.6vw, 3.4rem); line-height:1.08; font-weight:700; opacity:0; animation:rise .7s .1s ease forwards;}
+  h1.title span{color:var(--cyan);}
+  .hero p.lead{margin-top:18px; color:var(--muted); font-size:1.05rem; max-width:46ch; line-height:1.6; opacity:0; animation:rise .7s .25s ease forwards;}
+  .hero-cta{display:flex; gap:14px; margin-top:30px; flex-wrap:wrap; opacity:0; animation:rise .7s .4s ease forwards;}
+  .btn{padding:12px 22px; border-radius:8px; font-size:0.92rem; font-weight:500; text-decoration:none; display:inline-block; transition:transform .15s, background .2s, border-color .2s;}
+  .btn-primary{background:var(--cyan); color:#08121A;}
+  .btn-primary:hover{transform:translateY(-2px);}
+  .btn-ghost{border:1px solid var(--line); color:var(--text);}
+  .btn-ghost:hover{border-color:var(--cyan); color:var(--cyan);}
+  @keyframes rise{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);}}
+
+  /* readout panel in hero */
+  .scope{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:20px; opacity:0; animation:rise .8s .3s ease forwards;}
+  .scope-head{display:flex; justify-content:space-between; align-items:center; font-size:0.78rem; color:var(--muted); margin-bottom:14px;}
+  .scope-head .mono{color:var(--amber);}
+  svg.wave{width:100%; height:90px; display:block;}
+  .wave path{fill:none; stroke:var(--cyan); stroke-width:2;}
+  .scope-readings{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px; font-size:0.82rem;}
+  .reading{border-top:1px solid var(--line); padding-top:8px;}
+  .reading .val{font-family:'IBM Plex Mono', monospace; font-size:1.05rem; color:var(--text);}
+  .reading .lbl{color:var(--muted); font-size:0.72rem;}
+
+  /* SECTIONS GENERAL */
+  section{padding:86px 0; border-top:1px solid var(--line);}
+  .sec-head{display:flex; justify-content:space-between; align-items:baseline; gap:20px; margin-bottom:44px; flex-wrap:wrap;}
+  .sec-head h2{font-size:1.7rem;}
+  .sec-tag{color:var(--muted); font-size:0.85rem; max-width:34ch; text-align:right;}
+  .phase-badge{display:inline-flex; align-items:center; gap:8px; font-size:0.78rem; color:var(--amber); margin-bottom:10px;}
+  .phase-badge .bar{width:20px; height:2px; background:var(--amber);}
+
+  /* PIPELINE */
+  .pipeline{display:flex; flex-direction:column; border:1px solid var(--line); border-radius:12px; overflow:hidden;}
+  .pstep{display:flex; align-items:center; gap:18px; padding:18px 22px; background:var(--panel); position:relative; transition:background .2s;}
+  .pstep:not(:last-child){border-bottom:1px solid var(--line);}
+  .pstep:hover{background:var(--panel-2);}
+  .pstep .idx{font-family:'IBM Plex Mono', monospace; color:var(--muted); font-size:0.8rem; width:26px; flex:none;}
+  .pstep .name{font-weight:500; font-size:1rem;}
+  .pstep .desc{color:var(--muted); font-size:0.85rem; margin-top:2px;}
+  .pstep .arrow{margin-left:auto; color:var(--cyan); font-size:0.85rem; opacity:0.6;}
+
+  /* SIMULATOR */
+  .sim-panel{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:28px;}
+  .sim-title{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .sim-title .pulse{width:8px; height:8px; border-radius:50%; background:var(--amber); box-shadow:0 0 0 4px rgba(232,163,61,0.18);}
+  table.qa{width:100%; border-collapse:collapse; margin:22px 0; font-size:0.92rem;}
+  table.qa th{text-align:left; color:var(--muted); font-weight:500; font-size:0.78rem; padding:8px 10px; border-bottom:1px solid var(--line);}
+  table.qa td{padding:10px 10px; border-bottom:1px solid var(--line); font-family:'IBM Plex Mono', monospace;}
+  table.qa td.status{font-family:'IBM Plex Sans', sans-serif; font-weight:500;}
+  .status.ok{color:var(--good);}
+  .status.warn{color:var(--bad);}
+  .verdict-row{display:flex; gap:12px; margin-top:22px; flex-wrap:wrap;}
+  .vbtn{flex:1; min-width:140px; padding:14px; border-radius:8px; border:1px solid var(--line); background:transparent; color:var(--text); font-size:0.95rem; font-weight:500; cursor:pointer; transition:.2s;}
+  .vbtn:hover{border-color:var(--cyan);}
+  .vbtn:focus-visible{outline:2px solid var(--cyan); outline-offset:2px;}
+  #simResult{margin-top:16px; padding:14px 16px; border-radius:8px; font-size:0.9rem; display:none; line-height:1.55;}
+  #simResult.show{display:block;}
+  #simResult.correct{background:rgba(95,207,139,0.1); border:1px solid rgba(95,207,139,0.35); color:var(--good);}
+  #simResult.wrong{background:rgba(232,99,107,0.1); border:1px solid rgba(232,99,107,0.35); color:var(--bad);}
+
+  footer{padding:44px 0 calc(44px + env(safe-area-inset-bottom,0px)); color:var(--muted); font-size:0.85rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;}
+
+  @media (max-width:760px){
+    .hero-grid{grid-template-columns:1fr;}
+    .navlinks{position:fixed; top:64px; top:calc(64px + env(safe-area-inset-top,0px)); left:0; right:0; background:var(--ink); flex-direction:column; padding:16px 28px; border-bottom:1px solid var(--line); display:none;}
+    .navlinks.open{display:flex;}
+    .navtoggle{display:block; background:none; border:1px solid var(--line); color:var(--text); border-radius:6px; padding:8px 10px; font-size:0.9rem;}
+    .sec-head{flex-direction:column; align-items:flex-start;}
+    .sec-tag{text-align:left;}
+  }
+  [hidden]{display:none !important;}
+  a.pstep, a.btn, a.back, .navlinks a{cursor:pointer;}
+  a.pstep{text-decoration:none; color:inherit; cursor:pointer;}
+  a.pstep:hover .name{color:var(--cyan);}
+  a.pstep:hover .arrow{opacity:1;}
+  a.pstep:focus-visible{outline:2px solid var(--cyan); outline-offset:-2px;}
+  .pagewrap{padding-top:130px; padding-bottom:80px; min-height:80vh;}
+  .back{display:inline-block; color:var(--muted); text-decoration:none; font-size:0.9rem; margin-bottom:28px;}
+  .back:hover, .back:focus-visible{color:var(--cyan);}
+  #pgTitle{font-size:clamp(1.9rem,4vw,2.8rem); line-height:1.1; margin-bottom:14px;}
+  .pgdesc{color:var(--muted); font-size:1.05rem; line-height:1.6; max-width:56ch;}
+  .pgcards{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-top:38px;}
+  .pgcard{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:20px;}
+  .pgcard h3{font-size:1.05rem; margin-bottom:8px;}
+  .pgcard span{font-size:0.78rem; color:var(--amber);}
+  .pgnote{margin-top:40px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--line); padding-top:16px;}
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01ms !important; animation-iteration-count:1 !important;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap navrow">
+    <div class="brand"><span class="brand-mark" aria-hidden="true"></span> IMPA</div>
+    <button class="navtoggle" id="navToggle" aria-expanded="false" aria-controls="navLinks">Menu</button>
+    <div class="navlinks" id="navLinks">
+      <a data-go="#phase1" tabindex="0" role="link">Phase 1</a>
+      <a data-go="#phase2" tabindex="0" role="link">Phase 2</a>
+      <a data-go="#phase3" tabindex="0" role="link">Phase 3</a>
+      <a data-go="#phase4" tabindex="0" role="link">Phase 4</a>
+      <a data-go="#simulator" tabindex="0" role="link">Simulator</a>
+    </div>
+  </div>
+</nav>
+
+<div id="home">
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow-line"><span class="dot"></span> Now calibrating Phase 1</div>
+      <h1 class="title">Training the next generation of <span>medical physicists.</span></h1>
+      <p class="lead">IMPA — the International Medical Physics Academy — takes learners from first lecture to clinical-grade competency, one calibrated phase at a time.</p>
+      <div class="hero-cta">
+        <a data-go="#phase1" tabindex="0" role="link" class="btn btn-primary">Explore Phase 1</a>
+        <a data-go="#simulator" tabindex="0" role="link" class="btn btn-ghost">Try the QA simulator</a>
+      </div>
+    </div>
+    <div class="scope">
+      <div class="scope-head"><span>LIVE READOUT</span><span class="mono">LINAC-06 · 10X</span></div>
+      <svg class="wave" viewBox="0 0 300 90" preserveAspectRatio="none">
+        <path id="wavePath" d="M0,45 Q15,10 30,45 T60,45 T90,45 T120,45 T150,45 T180,45 T210,45 T240,45 T270,45 T300,45"/>
+      </svg>
+      <div class="scope-readings">
+        <div class="reading"><div class="val">1.01</div><div class="lbl">OUTPUT (cGy/MU)</div></div>
+        <div class="reading"><div class="val">10.2 MV</div><div class="lbl">ENERGY</div></div>
+        <div class="reading"><div class="val">1.3%</div><div class="lbl">SYMMETRY</div></div>
+        <div class="reading"><div class="val">2.1%</div><div class="lbl">FLATNESS</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section id="phase1">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="phase-badge"><span class="bar"></span>PHASE 1 — FREE</div>
+        <h2>Everything a first-year needs, at no cost</h2>
+      </div>
+      <div class="sec-tag">The open foundation: the site itself down to worked calculation problems.</div>
+    </div>
+    <div class="pipeline">
+      <a class="pstep" data-go="#/courses" tabindex="0" role="link"><span class="idx">01</span><div><div class="name">Courses</div><div class="desc">Structured curriculum by topic</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/youtube-lectures" tabindex="0" role="link"><span class="idx">02</span><div><div class="name">YouTube lectures</div><div class="desc">Full recorded teaching sessions</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/lecture-notes" tabindex="0" role="link"><span class="idx">03</span><div><div class="name">Lecture notes</div><div class="desc">Written companion to every lecture</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/quizzes" tabindex="0" role="link"><span class="idx">04</span><div><div class="name">Quizzes</div><div class="desc">Quick checks after each topic</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/calculation-questions" tabindex="0" role="link"><span class="idx">05</span><div><div class="name">Calculation questions</div><div class="desc">Worked numerical problem sets</div></div></a>
+    </div>
+  </div>
+</section>
+
+<section id="phase2">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="phase-badge"><span class="bar"></span>PHASE 2</div>
+        <h2>From concepts to clinical judgment</h2>
+      </div>
+      <div class="sec-tag">Where learners start reasoning like practicing physicists.</div>
+    </div>
+    <div class="pipeline">
+      <a class="pstep" data-go="#/clinical-cases" tabindex="0" role="link"><span class="idx">01</span><div><div class="name">Clinical cases</div><div class="desc">Real-world scenarios to reason through</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/question-bank" tabindex="0" role="link"><span class="idx">02</span><div><div class="name">Question bank</div><div class="desc">A growing archive of exam-style questions</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/mock-exams" tabindex="0" role="link"><span class="idx">03</span><div><div class="name">Mock exams</div><div class="desc">Timed, full-length practice exams</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/certificates" tabindex="0" role="link"><span class="idx">04</span><div><div class="name">Certificates</div><div class="desc">Proof of completion learners can share</div></div></a>
+    </div>
+  </div>
+</section>
+
+<section id="phase3">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="phase-badge"><span class="bar"></span>PHASE 3</div>
+        <h2>A living academic community</h2>
+      </div>
+      <div class="sec-tag">People, not just content — faculty, research, and real accounts.</div>
+    </div>
+    <div class="pipeline">
+      <a class="pstep" data-go="#/live-classes" tabindex="0" role="link"><span class="idx">01</span><div><div class="name">Live classes</div><div class="desc">Scheduled sessions with real-time Q&A</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/faculty" tabindex="0" role="link"><span class="idx">02</span><div><div class="name">Faculty</div><div class="desc">Practicing medical physicists as instructors</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/research-center" tabindex="0" role="link"><span class="idx">03</span><div><div class="name">Research center</div><div class="desc">A home for papers, data, and ongoing studies</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/student-accounts" tabindex="0" role="link"><span class="idx">04</span><div><div class="name">Student accounts</div><div class="desc">Personal progress, saved work, history</div></div></a>
+    </div>
+  </div>
+</section>
+
+<section id="phase4">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="phase-badge"><span class="bar"></span>PHASE 4</div>
+        <h2>The long-term platform</h2>
+      </div>
+      <div class="sec-tag">Where IMPA becomes an everyday professional tool.</div>
+    </div>
+    <div class="pipeline">
+      <a class="pstep" data-go="#/ai-tutor" tabindex="0" role="link"><span class="idx">01</span><div><div class="name">AI tutor</div><div class="desc">On-demand help, tuned to medical physics</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/advanced-lms" tabindex="0" role="link"><span class="idx">02</span><div><div class="name">Advanced LMS</div><div class="desc">Full learning management for institutions</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/mobile-app" tabindex="0" role="link"><span class="idx">03</span><div><div class="name">Mobile app</div><div class="desc">Learning that travels with the clinic day</div></div><span class="arrow">↓</span></a>
+      <a class="pstep" data-go="#/community" tabindex="0" role="link"><span class="idx">04</span><div><div class="name">Global professional community</div><div class="desc">Physicists worldwide, connected</div></div></a>
+    </div>
+  </div>
+</section>
+
+<section id="simulator">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="phase-badge"><span class="bar"></span>SIGNATURE FEATURE</div>
+        <h2>IMPA Clinical Medical Physics Simulator</h2>
+      </div>
+      <div class="sec-tag">Run a simulated LINAC QA check and decide: pass, or fail?</div>
+    </div>
+    <div class="sim-panel">
+      <div class="sim-title"><span class="pulse"></span><strong class="mono">LINAC QA SIMULATOR</strong></div>
+      <p style="color:var(--muted); font-size:0.9rem;">Review this morning's measurements against tolerance, then make the call.</p>
+      <table class="qa">
+        <thead><tr><th>Parameter</th><th>Measured</th><th>Tolerance</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Output</td><td>1.01</td><td>±2%</td><td class="status ok">Within</td></tr>
+          <tr><td>Energy</td><td>10.2</td><td>±2%</td><td class="status ok">Within</td></tr>
+          <tr><td>Symmetry</td><td>1.3%</td><td>±2%</td><td class="status ok">Within</td></tr>
+          <tr><td>Flatness</td><td>2.1%</td><td>±3%</td><td class="status ok">Within</td></tr>
+        </tbody>
+      </table>
+      <div class="verdict-row">
+        <button class="vbtn" id="passBtn">PASS</button>
+        <button class="vbtn" id="failBtn">FAIL</button>
+      </div>
+      <div id="simResult" role="status"></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div id="page" hidden>
+  <div class="wrap pagewrap">
+    <a class="back" id="backLink" data-go="#" tabindex="0" role="link">Back</a>
+    <div class="phase-badge"><span class="bar"></span><span id="pgPhase"></span></div>
+    <h1 id="pgTitle"></h1>
+    <p class="pgdesc" id="pgDesc"></p>
+    <div class="pgcards" id="pgCards"></div>
+    <p class="pgnote">Design preview. Real content for this page will be added here.</p>
+  </div>
+</div>
+
+<footer class="wrap">
+  <span>© 2026 IMPA — International Medical Physics Academy</span>
+  <span>Preview build · Phase 1 in progress</span>
+</footer>
+
+<script>
+  const toggle = document.getElementById('navToggle');
+  const links = document.getElementById('navLinks');
+  toggle.addEventListener('click', () => {
+    const open = links.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open);
+  });
+  links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    links.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }));
+
+  const result = document.getElementById('simResult');
+  function verdict(choice){
+    const correct = 'PASS'; // all four parameters are within tolerance
+    const isRight = choice === correct;
+    result.className = 'show ' + (isRight ? 'correct' : 'wrong');
+    result.textContent = isRight
+      ? 'Correct — PASS. Every parameter sits inside its tolerance band, so the machine is cleared for treatment today.'
+      : 'Not quite — the correct call is PASS. All four readings (output, energy, symmetry, flatness) are within their stated tolerances, so there\'s no basis to fail the machine today.';
+  }
+  document.getElementById('passBtn').addEventListener('click', () => verdict('PASS'));
+  document.getElementById('failBtn').addEventListener('click', () => verdict('FAIL'));
+
+  const PH={1:'PHASE 1 - FREE',2:'PHASE 2',3:'PHASE 3',4:'PHASE 4'};
+  const PAGES={
+    'courses':['Courses',1,'Structured curriculum organised by topic, from first principles to clinical practice.',['Radiation Physics','Radiotherapy Physics','Imaging and Nuclear Medicine']],
+    'youtube-lectures':['YouTube lectures',1,'Full recorded teaching sessions, grouped by course.',['Lecture playlists','Latest uploads','Topic search']],
+    'lecture-notes':['Lecture notes',1,'Written notes that go with every lecture, ready to read or print.',['Course notes','Formula sheets','Quick revision summaries']],
+    'quizzes':['Quizzes',1,'Short checks after each topic to see what has stuck.',['Topic quizzes','Instant feedback','Progress overview']],
+    'calculation-questions':['Calculation questions',1,'Worked numerical problems with step-by-step solutions.',['Dosimetry problems','Decay and attenuation','Treatment planning maths']],
+    'clinical-cases':['Clinical cases',2,'Real-world scenarios to reason through like a practising physicist.',['Case library','Difficulty levels','Expert walkthroughs']],
+    'question-bank':['Question bank',2,'A growing archive of exam-style questions you can filter and practise.',['Filter by topic','Filter by difficulty','Saved questions']],
+    'mock-exams':['Mock exams',2,'Timed, full-length practice exams under realistic conditions.',['Full-length papers','Timed mode','Score breakdown']],
+    'certificates':['Certificates',2,'Proof of completion that learners can download and share.',['Course certificates','Verification link','Download as PDF']],
+    'live-classes':['Live classes',3,'Scheduled sessions with real-time questions and answers.',['Upcoming schedule','Join a session','Past recordings']],
+    'faculty':['Faculty',3,'The practising medical physicists who teach at IMPA.',['Instructor profiles','Areas of expertise','Contact and office hours']],
+    'research-center':['Research center',3,'A home for papers, datasets and ongoing studies.',['Publications','Open datasets','Active projects']],
+    'student-accounts':['Student accounts',3,'Personal progress, saved work and learning history in one place.',['Sign in','My progress','Saved items']],
+    'ai-tutor':['AI tutor',4,'On-demand help tuned to medical physics questions.',['Ask a question','Explain a solution','Practice with me']],
+    'advanced-lms':['Advanced LMS',4,'Full learning management for classes and institutions.',['Cohorts and classes','Assignments and grading','Analytics']],
+    'mobile-app':['Mobile app',4,'Learning that travels with the clinic day.',['Offline lectures','Push reminders','Quick quizzes']],
+    'community':['Global professional community',4,'Medical physicists worldwide, connected in one network.',['Discussion forums','Regional groups','Mentorship']]
+  };
+  const home=document.getElementById('home'), page=document.getElementById('page');
+  function route(h){
+    h=h||location.hash; const d=h.startsWith('#/')?PAGES[h.slice(2)]:null;
+    if(d){
+      document.getElementById('pgPhase').textContent=PH[d[1]];
+      document.getElementById('pgTitle').textContent=d[0];
+      document.getElementById('pgDesc').textContent=d[2];
+      const back=document.getElementById('backLink');
+      back.textContent='Back to Phase '+d[1];
+      back.setAttribute('data-go','#phase'+d[1]);
+      const box=document.getElementById('pgCards'); box.textContent='';
+      d[3].forEach(t=>{
+        const c=document.createElement('div'); c.className='pgcard';
+        const e=document.createElement('h3'); e.textContent=t;
+        const b=document.createElement('span'); b.textContent='Coming soon';
+        c.append(e,b); box.append(c);
+      });
+      document.title=d[0]+' - IMPA';
+      home.hidden=true; page.hidden=false; window.scrollTo(0,0);
+    } else {
+      document.title='IMPA - International Medical Physics Academy';
+      page.hidden=true; home.hidden=false;
+      const el=h.length>1?document.querySelector(h):null;
+      if(el) el.scrollIntoView(); else window.scrollTo(0,0);
+    }
+  }
+  window.addEventListener('hashchange',()=>route());
+  function go(e){
+    const a=e.target.closest('[data-go]');
+    if(!a) return;
+    if(e.type==='keydown' && e.key!=='Enter') return;
+    e.preventDefault();
+    route(a.getAttribute('data-go'));
+  }
+  document.addEventListener('click',go);
+  document.addEventListener('keydown',go);
+  route();
+</script>
+</body>
+</html>
